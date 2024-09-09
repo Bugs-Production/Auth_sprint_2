@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: auth_postgres_tests
+    restart: always
+    env_file:
+      - .env.test
+    ports:
+      - "127.0.0.1:15432:5432"
+
+  redis:
+    image: redis:latest
+    container_name: auth_redis_tests
+    restart: always
+    ports:
+      - "127.0.0.1:16379:6379"
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth_fastapi_tests
+    env_file:
+      - .env.test
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./src:/src
+    ports:
+      - "127.0.0.1:8080:8000"
