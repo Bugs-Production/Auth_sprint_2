@@ -1,0 +1,171 @@
+services:
+
+# ------- auth_service ------ #
+  auth_service:
+    build:
+      dockerfile: Dockerfile
+      context: ./auth_service
+    container_name: movies_auth
+    env_file:
+      - ./auth_service/.env
+    restart: always
+    depends_on:
+      postgres_auth:
+        condition: service_healthy
+    networks:
+      - movies_network
+    volumes:
+      - ./auth_service/src:/auth_service/src
+
+  postgres_auth:
+    image: postgres:16
+    container_name: movies_postgres_auth
+    volumes:
+      - postgres_data_auth:/var/lib/postgresql/data
+    restart: always
+    env_file: ./auth_service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - movies_network
+
+  redis_auth:
+    image: redis:latest
+    container_name: movies_redis_auth
+    env_file:
+      ./auth_service/.env
+    volumes:
+      - ./redis-data:/var/lib/redis
+    networks:
+      - movies_network
+
+
+# ------- movies_service ------ #
+  movies_api:
+    build:
+      dockerfile: Dockerfile
+      context: ./movies_service
+    container_name: movies_service
+    restart: always
+    env_file:
+      - ./movies_service/.env
+    depends_on:
+      elastic:
+        condition: service_healthy
+      postgres_movies:
+        condition: service_healthy
+    networks:
+      - movies_network
+    volumes:
+      - ./movies_service/src:/movies_service/src
+
+  elastic:
+    image: elasticsearch:8.6.2
+    container_name: movies_es
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+    env_file:
+      - ./movies_service/.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200/" ]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+    networks:
+      - movies_network
+
+  postgres_movies:
+    image: postgres:16
+    container_name: movies_postgres
+    restart: always
+    env_file: ./movies_service/.env
+    volumes:
+      - postgres_data_movies:/var/lib/postgresql/data
+      - ./movies_service/data/data_dump.sql:/docker-entrypoint-initdb.d/data_dump.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - movies_network
+
+  postgres_to_elastic:
+    container_name: movies_postgres_to_elastic
+    build:
+      dockerfile: data_sync.Dockerfile
+      context: ./movies_service/.
+    volumes:
+      - ./movies_service/src:/movies_service/src
+    env_file:
+      - ./movies_service/.env
+    depends_on:
+      elastic:
+        condition: service_healthy
+      postgres_movies:
+        condition: service_healthy
+    networks:
+      - movies_network
+
+  redis_movies:
+    image: redis:latest
+    container_name: movies_redis
+    env_file:
+      ./movies_service/.env
+    volumes:
+      - ./redis-data:/var/lib/redis
+    networks:
+      - movies_network
+
+
+# ------- django_admin ------ #
+  django:
+    build:
+      dockerfile: Dockerfile
+      context: ./django_admin
+    container_name: movies_django
+    env_file:
+      ./django_admin/.env
+    restart: always
+    volumes:
+      - ./django_admin/static:/app/static
+      - ./django_admin/media:/app/media
+    depends_on:
+      postgres_movies:
+        condition: service_healthy
+    networks:
+      - movies_network
+
+
+# ------- general nginx ------ #
+  nginx:
+      container_name: movies_nginx
+      build:
+        context: ./nginx/.
+        dockerfile: Dockerfile
+      restart: always
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+        - ./django_admin/static:/app/static
+        - ./django_admin/media:/app/media
+      depends_on:
+        - django
+        - auth_service
+        - movies_api
+      ports:
+        - "80:80"
+      networks:
+        - movies_network
+
+networks:
+  movies_network:
+
+volumes:
+  postgres_data_auth:
+  postgres_data_movies:
+

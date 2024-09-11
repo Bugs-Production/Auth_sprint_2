@@ -28,14 +28,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan,
     title=settings.project_name,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url="/auth/api/openapi/",
+    openapi_url="/auth/api/openapi.json",
     default_response_class=ORJSONResponse,
 )
 
-app.include_router(roles.router, prefix="/api/v1/roles", tags=["roles"])
-app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
-app.include_router(admins.router, prefix="/api/v1/users", tags=["admins"])
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(roles.router, prefix="/auth/api/v1/roles", tags=["roles"])
+app.include_router(users.router, prefix="/auth/api/v1/users", tags=["users"])
+app.include_router(admins.router, prefix="/auth/api/v1/users", tags=["admins"])
+app.include_router(auth.router, prefix="/auth/api/v1/auth", tags=["auth"])
 
 add_pagination(app)

@@ -16,25 +16,15 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: content; Type: SCHEMA; Schema: -; Owner: app
---
+-- Удаление существующих объектов, если они есть
+DROP SCHEMA IF EXISTS content CASCADE;
 
+-- Создание схемы
 CREATE SCHEMA content;
 
-
-ALTER SCHEMA content OWNER TO app;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: film_work; Type: TABLE; Schema: content; Owner: app
---
-
-CREATE TABLE content.film_work (
-    id uuid NOT NULL,
+-- Создание таблиц
+CREATE TABLE IF NOT EXISTS content.film_work (
+    id uuid PRIMARY KEY,
     title text NOT NULL,
     description text,
     creation_date date,
@@ -45,66 +35,46 @@ CREATE TABLE content.film_work (
     modified timestamp with time zone
 );
 
-
-ALTER TABLE content.film_work OWNER TO app;
-
---
--- Name: genre; Type: TABLE; Schema: content; Owner: app
---
---
-CREATE TABLE content.genre (
-    id uuid NOT NULL,
+CREATE TABLE IF NOT EXISTS content.genre (
+    id uuid PRIMARY KEY,
     name text NOT NULL,
     description text,
     created timestamp with time zone,
     modified timestamp with time zone
 );
 
-
-ALTER TABLE content.genre OWNER TO app;
-
---
--- Name: genre_film_work; Type: TABLE; Schema: content; Owner: app
---
-
-CREATE TABLE content.genre_film_work (
-    id uuid NOT NULL,
-    genre_id uuid NOT NULL,
-    film_work_id uuid NOT NULL,
+CREATE TABLE IF NOT EXISTS content.genre_film_work (
+    id uuid PRIMARY KEY,
+    genre_id uuid NOT NULL REFERENCES content.genre (id) ON DELETE CASCADE,
+    film_work_id uuid NOT NULL REFERENCES content.film_work (id) ON DELETE CASCADE,
     created timestamp with time zone
 );
 
-
-ALTER TABLE content.genre_film_work OWNER TO app;
-
---
--- Name: person; Type: TABLE; Schema: content; Owner: app
---
-
-CREATE TABLE content.person (
-    id uuid NOT NULL,
+CREATE TABLE IF NOT EXISTS content.person (
+    id uuid PRIMARY KEY,
     full_name text NOT NULL,
     created timestamp with time zone,
     modified timestamp with time zone
 );
 
-
-ALTER TABLE content.person OWNER TO app;
-
---
--- Name: person_film_work; Type: TABLE; Schema: content; Owner: app
---
-
-CREATE TABLE content.person_film_work (
-    id uuid NOT NULL,
-    film_work_id uuid NOT NULL,
-    person_id uuid NOT NULL,
+CREATE TABLE IF NOT EXISTS content.person_film_work (
+    id uuid PRIMARY KEY,
+    film_work_id uuid NOT NULL REFERENCES content.film_work (id) ON DELETE CASCADE,
+    person_id uuid NOT NULL REFERENCES content.person (id) ON DELETE CASCADE,
     role text NOT NULL,
     created timestamp with time zone
 );
 
+-- Создание индексов
+CREATE INDEX IF NOT EXISTS film_work_creation_date_idx ON content.film_work (creation_date);
 
-ALTER TABLE content.person_film_work OWNER TO app;
+CREATE UNIQUE INDEX IF NOT EXISTS film_work_person_idx ON content.person_film_work (film_work_id, person_id, role);
+CREATE UNIQUE INDEX IF NOT EXISTS film_work_genre_idx ON content.genre_film_work (film_work_id, genre_id);
+
+CREATE INDEX IF NOT EXISTS genre_film_work_genre_id_idx ON content.genre_film_work (genre_id);
+CREATE INDEX IF NOT EXISTS genre_film_work_film_work_id_idx ON content.genre_film_work (film_work_id);
+CREATE INDEX IF NOT EXISTS person_film_work_person_id_idx ON content.person_film_work (person_id);
+CREATE INDEX IF NOT EXISTS person_film_work_film_work_id_idx ON content.person_film_work (film_work_id);
 
 --
 -- Data for Name: film_work; Type: TABLE DATA; Schema: content; Owner: app
@@ -13349,100 +13319,6 @@ c789099a-d49f-4895-b250-bc8064094073	17bc0cc6-6d9d-4a7c-81b3-4556e1d3ac04	7f09d6
 f67bbd77-67a4-4872-a343-40b97497c006	2dd036a4-f5d0-4e81-8073-a36da2a684b7	0f5df313-bfe5-450b-942c-3844214b7c41	actor	2021-06-16 20:14:09.934673+00
 73d0f092-06ed-48d5-bb02-8da8933fbfe2	83af8d01-580a-462e-8c96-2171385935cc	97568425-6959-4b86-b81d-d3198eabfdac	writer	2021-06-16 20:14:09.93471+00
 \.
-
-
---
--- Name: film_work film_work_pkey; Type: CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.film_work
-    ADD CONSTRAINT film_work_pkey PRIMARY KEY (id);
-
-
---
--- Name: genre_film_work genre_film_work_pkey; Type: CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.genre_film_work
-    ADD CONSTRAINT genre_film_work_pkey PRIMARY KEY (id);
-
-
---
--- Name: genre genre_pkey; Type: CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.genre
-    ADD CONSTRAINT genre_pkey PRIMARY KEY (id);
-
-
---
--- Name: person_film_work person_film_work_pkey; Type: CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.person_film_work
-    ADD CONSTRAINT person_film_work_pkey PRIMARY KEY (id);
-
-
---
--- Name: person person_pkey; Type: CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.person
-    ADD CONSTRAINT person_pkey PRIMARY KEY (id);
-
-
---
--- Name: film_work_creation_date_idx; Type: INDEX; Schema: content; Owner: app
---
-
-CREATE INDEX film_work_creation_date_idx ON content.film_work USING btree (creation_date);
-
-
---
--- Name: film_work_genre_idx; Type: INDEX; Schema: content; Owner: app
---
-
-CREATE UNIQUE INDEX film_work_genre_idx ON content.genre_film_work USING btree (film_work_id, genre_id);
-
-
---
--- Name: film_work_person_idx; Type: INDEX; Schema: content; Owner: app
---
-
-CREATE UNIQUE INDEX film_work_person_idx ON content.person_film_work USING btree (film_work_id, person_id, role);
-
-
---
--- Name: genre_film_work genre_film_work_film_work_id_fkey; Type: FK CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.genre_film_work
-    ADD CONSTRAINT genre_film_work_film_work_id_fkey FOREIGN KEY (film_work_id) REFERENCES content.film_work(id) ON DELETE CASCADE;
-
-
---
--- Name: genre_film_work genre_film_work_genre_id_fkey; Type: FK CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.genre_film_work
-    ADD CONSTRAINT genre_film_work_genre_id_fkey FOREIGN KEY (genre_id) REFERENCES content.genre(id) ON DELETE CASCADE;
-
-
---
--- Name: person_film_work person_film_work_film_work_id_fkey; Type: FK CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.person_film_work
-    ADD CONSTRAINT person_film_work_film_work_id_fkey FOREIGN KEY (film_work_id) REFERENCES content.film_work(id) ON DELETE CASCADE;
-
-
---
--- Name: person_film_work person_film_work_person_id_fkey; Type: FK CONSTRAINT; Schema: content; Owner: app
---
-
-ALTER TABLE ONLY content.person_film_work
-    ADD CONSTRAINT person_film_work_person_id_fkey FOREIGN KEY (person_id) REFERENCES content.person(id) ON DELETE CASCADE;
-
 
 --
 -- PostgreSQL database dump complete

@@ -1,8 +1,8 @@
 FROM python:3.11
 
-WORKDIR /src
+WORKDIR /auth_service/src
 
-ENV PYTHONPATH=/src
+ENV PYTHONPATH=/auth_service/src
 
 COPY requirements.txt requirements.txt
 

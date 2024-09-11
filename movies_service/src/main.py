@@ -26,14 +26,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan,
     title=config.project_name,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url="/movies/api/openapi/",
+    openapi_url="/movies/api/openapi.json",
     default_response_class=ORJSONResponse,
 )
 
 
 # Подключаем роутер к серверу, указав префикс /v1/films
 # Теги указываем для удобства навигации по документации
-app.include_router(films.router, prefix="/api/v1/films", tags=["films"])
-app.include_router(persons.router, prefix="/api/v1/persons", tags=["persons"])
-app.include_router(genres.router, prefix="/api/v1/genres", tags=["genres"])
+app.include_router(films.router, prefix="/movies/api/v1/films", tags=["films"])
+app.include_router(persons.router, prefix="/movies/api/v1/persons", tags=["persons"])
+app.include_router(genres.router, prefix="/movies/api/v1/genres", tags=["genres"])
