@@ -141,6 +141,8 @@ services:
     networks:
       - movies_network
 
+
+# ------- general nginx ------ #
   nginx:
       container_name: movies_nginx
       build:

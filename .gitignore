@@ -165,7 +165,5 @@ cython_debug/
 redis_data/
 redis.conf
 
-aucth_service/data/
-
 django_admin/static/
 django_admin/media/
