@@ -27,9 +27,15 @@ class User(Base):
     email = Column(EmailType)
     birthdate = Column(Date)
     created_at = Column(DateTime, default=func.now())
-    roles = relationship("Role", secondary=user_role, backref="users", cascade="all, delete")
-    login_history = relationship("LoginHistory", back_populates="user", cascade="all, delete")
-    refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete")
+    roles = relationship(
+        "Role", secondary=user_role, backref="users", cascade="all, delete"
+    )
+    login_history = relationship(
+        "LoginHistory", back_populates="user", cascade="all, delete"
+    )
+    refresh_tokens = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete"
+    )
 
     def __init__(
         self, login: str, password: str, first_name: str, last_name: str
