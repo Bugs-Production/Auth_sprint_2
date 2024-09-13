@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     access_token_exp_hours: int = Field(1, alias="ACCESS_TOKEN_EXP_HOURS")
     refresh_token_exp_days: int = Field(10, alias="REFRESH_TOKEN_EXP_DAYS")
     engine_echo: bool = Field(False, alias="ENGINE_ECHO")
-    jaeger_host: str = Field("localhost", alias="JAEGER_HOST")
+    jaeger_host: str = Field("127.0.0.1", alias="JAEGER_HOST")
     jaeger_port: int = Field(6831, alias="JAEGER_PORT")
 
 
