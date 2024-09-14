@@ -34,6 +34,7 @@ class UpdateUserSchema(BaseModel):
 class UserLoginHistorySchema(BaseModel):
     event_date: datetime
     success: bool
+    user_agent: str
 
 
 class CreateUserSchema(BaseModel):

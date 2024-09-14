@@ -103,11 +103,12 @@ class UserService:
             user_roles = user.roles
             return user_roles
 
-    async def save_login_history(self, user_id) -> None:
+    async def save_login_history(self, user_id: str, user_agent: str) -> None:
         async with self.postgres_session() as session:
             login_history = db_models.LoginHistory(
                 user_id=user_id,
                 success=True,
+                user_agent=user_agent,
             )
             session.add(login_history)
             await session.commit()
