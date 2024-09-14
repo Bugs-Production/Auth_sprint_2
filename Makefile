@@ -18,3 +18,7 @@ makemigrations:
 .PHONY: migrate_auth
 migrate_auth:
 	docker exec movies_auth alembic upgrade head
+
+.PHONY: load_movies
+load_movies:
+	docker exec movies_django python manage.py loaddata movies_data.json
