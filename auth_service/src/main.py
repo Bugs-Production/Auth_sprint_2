@@ -13,6 +13,7 @@ from core.config import settings
 from core.jaeger import configure_tracer
 from db import postgres, redis
 from middlewares.request_id_middleware import request_id_middleware
+from middlewares.request_limit_middleware import check_request_limit
 
 
 @asynccontextmanager
@@ -42,6 +43,9 @@ app = FastAPI(
 configure_tracer()
 FastAPIInstrumentor.instrument_app(app)
 app.middleware("http")(request_id_middleware)
+
+# для лимита запросов
+app.middleware("http")(check_request_limit)
 
 app.include_router(roles.router, prefix="/auth/api/v1/roles", tags=["roles"])
 app.include_router(users.router, prefix="/auth/api/v1/users", tags=["users"])
