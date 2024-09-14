@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -21,6 +21,7 @@ class LoginHistory(Base):
     event_date = Column(DateTime, default=func.now(), nullable=False)
     success = Column(Boolean, nullable=False)  # True для успеха, False для неудачи
     user = relationship("User", back_populates="login_history")
+    user_agent = Column(Text, nullable=False)
 
     def __repr__(self) -> str:
         return f"<LoginHistory {self.user_id} at {self.event_date}>"

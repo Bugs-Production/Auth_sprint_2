@@ -20,6 +20,7 @@ def configure_tracer() -> None:
         )
     )
     # Чтобы видеть трейсы в консоли
-    trace.get_tracer_provider().add_span_processor(
-        BatchSpanProcessor(ConsoleSpanExporter())
-    )
+    if settings.jaeger_logs:
+        trace.get_tracer_provider().add_span_processor(
+            BatchSpanProcessor(ConsoleSpanExporter())
+        )

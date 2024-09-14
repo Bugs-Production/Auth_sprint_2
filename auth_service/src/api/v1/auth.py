@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.auth_utils import decode_token
 from schemas.auths import (AuthOutputSchema, LoginInputSchema,
@@ -119,6 +119,7 @@ async def refresh(
     },
 )
 async def login(
+    request: Request,
     login_data: LoginInputSchema,
     auth_service: AuthService = Depends(get_auth_service),
     user_service: UserService = Depends(get_user_service),
@@ -132,8 +133,9 @@ async def login(
         raise HTTPException(HTTPStatus.BAD_REQUEST, detail="invalid password")
 
     user_id = str(user.id)
+    user_agent = request.headers.get("user-agent", "Unknown")
 
-    await user_service.save_login_history(user_id)
+    await user_service.save_login_history(user_id, user_agent)
 
     user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
 
