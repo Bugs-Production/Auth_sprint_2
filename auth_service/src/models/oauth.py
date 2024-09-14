@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from db.postgres import Base
-from models import OAuthProvidersEnum
 
 
 class OAuthAccount(Base):
@@ -30,4 +29,4 @@ class OAuthAccount(Base):
     )
     user = relationship("User", back_populates="oauth_accounts", lazy=True)
     oauth_user_id = Column(String(length=255))
-    provider_type = Column(Enum(OAuthProvidersEnum), nullable=False)
+    provider_type = Column(String(50), nullable=False)
