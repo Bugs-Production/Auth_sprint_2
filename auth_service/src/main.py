@@ -40,9 +40,10 @@ app = FastAPI(
 )
 
 # для трассировки Jaeger
-configure_tracer()
-FastAPIInstrumentor.instrument_app(app)
-app.middleware("http")(request_id_middleware)
+if settings.jaeger_enabled:
+    configure_tracer()
+    FastAPIInstrumentor.instrument_app(app)
+    app.middleware("http")(request_id_middleware)
 
 # для лимита запросов
 app.middleware("http")(check_request_limit)

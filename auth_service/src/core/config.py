@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     jaeger_host: str = Field("127.0.0.1", alias="JAEGER_HOST")
     jaeger_port: int = Field(6831, alias="JAEGER_PORT")
     jaeger_logs: bool = Field(False, alias="JAEGER_LOGS")
+    jaeger_enabled: bool = Field(False, alias="JAEGER_ENABLED")
     request_limit: int = Field(15, alias="REQUEST_LIMIT")
 
 
