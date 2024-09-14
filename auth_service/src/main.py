@@ -66,3 +66,7 @@ app.include_router(auth.router, prefix="/auth/api/v1/auth", tags=["auth"])
 app.include_router(oauth2.router, prefix="/auth/api/v1/oauth", tags=["oauth2"])
 
 add_pagination(app)
+
+# Для локального запуска
+if __name__ == "__main__":
+    uvicorn.run(app="main:app", port=8000, reload=True)
