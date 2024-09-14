@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     engine_echo: bool = Field(False, alias="ENGINE_ECHO")
     jaeger_host: str = Field("127.0.0.1", alias="JAEGER_HOST")
     jaeger_port: int = Field(6831, alias="JAEGER_PORT")
+    request_limit: int = Field(15, alias="REQUEST_LIMIT")
 
 
 settings = Settings()
