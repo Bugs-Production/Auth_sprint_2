@@ -36,6 +36,17 @@ class UserService:
 
             return user
 
+    async def get_user_by_email(self, email: str) -> db_models.User:
+        async with self.postgres_session() as session:
+            user_scalars = await session.scalars(
+                select(db_models.User).where(db_models.User.email == email)
+            )
+            user = user_scalars.first()
+            if not user:
+                raise ObjectNotFoundError
+
+            return user
+
     async def update_user(
         self, user_id: UUID, user_data: UpdateUserSchema
     ) -> db_models.User:

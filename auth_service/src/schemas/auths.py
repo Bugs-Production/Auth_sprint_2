@@ -14,3 +14,11 @@ class RefreshInputSchema(BaseModel):
 class LoginInputSchema(BaseModel):
     login: str = Field(min_length=1)
     password: str = Field(min_length=1)
+
+
+class OAuthUser(BaseModel):
+    oauth_user_id: str
+    email: str
+    first_name: str | None = None
+    last_name: str | None = None
+    provider_type: str
