@@ -9,7 +9,9 @@ from models.roles import Role
 from models.user import User
 
 
-async def create_superuser(login: str, password: str, first_name: str, last_name: str):
+async def create_superuser(
+    login: str, password: str, first_name: str, last_name: str, email: str
+):
     engine = create_async_engine(postgres.dsn, echo=settings.engine_echo, future=True)
     async_session = async_sessionmaker(
         bind=engine, expire_on_commit=False, class_=AsyncSession
@@ -22,6 +24,7 @@ async def create_superuser(login: str, password: str, first_name: str, last_name
             password=hashed_password,
             first_name=first_name,
             last_name=last_name,
+            email=email,
         )
         superuser.roles.append(role)
         session.add(superuser)
