@@ -15,7 +15,7 @@ from core.config import settings
 from db.postgres import get_postgres_session
 from schemas.auths import AuthOutputSchema, OAuthUser
 from schemas.users import CreateUserSchema
-from services.exceptions import ObjectNotFoundError
+from services.exceptions import OAuthUserNotFoundError, ObjectNotFoundError
 from services.user import UserService, get_user_service
 
 
@@ -34,6 +34,10 @@ class AbstractOAuthService(ABC):
 
     @abstractmethod
     async def authorize_user(self, *args, **kwargs) -> AuthOutputSchema:
+        pass
+
+    @abstractmethod
+    async def delete_oauth_account(self, *args, **kwargs) -> None:
         pass
 
 
@@ -118,7 +122,9 @@ class OAuthServiceGoogle(AbstractOAuthService):
 
             return user
 
-    async def authorize_user(self, user_data: OAuthUser, user_agent: str) -> AuthOutputSchema:
+    async def authorize_user(
+        self, user_data: OAuthUser, user_agent: str
+    ) -> AuthOutputSchema:
         oauth_user_db = await self.get_oauth_user_from_db(user_data.oauth_user_id)
 
         if oauth_user_db:
@@ -156,6 +162,34 @@ class OAuthServiceGoogle(AbstractOAuthService):
         await self.user_service.save_login_history(service_user.id, user_agent)
 
         return service_user
+
+    async def get_oauth_user_by_service_user_id(
+        self, service_user_id: str
+    ) -> db_models.OAuthAccount | None:
+        async with self.postgres_session() as session:
+            user_scalars = await session.scalars(
+                select(db_models.OAuthAccount).where(
+                    db_models.OAuthAccount.user_id == service_user_id,
+                    db_models.OAuthAccount.provider_type == self.provider_name,
+                )
+            )
+            user = user_scalars.first()
+
+            return user if user else None
+
+    async def delete_oauth_account(self, login: str) -> None:
+        service_user = await self.user_service.get_user_by_login(login)
+
+        if service_user is None:
+            raise ObjectNotFoundError
+
+        oauth_user = await self.get_oauth_user_by_service_user_id(service_user.id)
+        if oauth_user is None:
+            raise OAuthUserNotFoundError
+
+        async with self.postgres_session() as session:
+            await session.delete(oauth_user)
+            await session.commit()
 
 
 @lru_cache()
