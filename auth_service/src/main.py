@@ -57,7 +57,10 @@ if settings.jaeger_enabled:
     app.middleware("http")(request_id_middleware)
 
 # для лимита запросов
-app.middleware("http")(check_request_limit)
+if settings.request_limit_enabled:
+    app.middleware("http")(check_request_limit)
+
+# для использования OAuth аутентификации
 app.add_middleware(SessionMiddleware, secret_key=settings.jwt_secret_key)
 
 app.include_router(roles.router, prefix="/auth/api/v1/roles", tags=["roles"])

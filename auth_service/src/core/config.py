@@ -32,7 +32,9 @@ class Settings(BaseSettings):
     jaeger_port: int = Field(6831, alias="JAEGER_PORT")
     jaeger_logs: bool = Field(False, alias="JAEGER_LOGS")
     jaeger_enabled: bool = Field(False, alias="JAEGER_ENABLED")
+
     request_limit: int = Field(15, alias="REQUEST_LIMIT")
+    request_limit_enabled: bool = Field(False, alias="REQUEST_LIMIT_ENABLED")
 
     google_client_id: str = Field("google_client_id", alias="GOOGLE_CLIENT_ID")
     google_client_secret: str = Field(
