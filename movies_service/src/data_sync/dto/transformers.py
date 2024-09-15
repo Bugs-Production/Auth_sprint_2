@@ -34,6 +34,7 @@ class FilmsElasticTransformer(Transformer):
             genres=[genre.model_dump() for genre in genres],
             title=data.title,
             description=data.description,
+            viewing_permission=data.viewing_permission,
             actors_names=[person.name for person in el_actors],
             directors_names=[person.name for person in el_directors],
             writers_names=[person.name for person in el_writers],

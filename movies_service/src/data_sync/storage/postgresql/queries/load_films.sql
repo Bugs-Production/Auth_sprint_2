@@ -6,6 +6,7 @@ SELECT
    fw.type,
    fw.created,
    fw.modified,
+   fw.viewing_permission,
    ARRAY_AGG(DISTINCT CONCAT(g.id, ': ', g.name)) AS "genres",
     ARRAY_AGG(DISTINCT CONCAT(p.id, ': ', p.full_name))
         FILTER (WHERE pfw.role = 'actor') AS "actors",

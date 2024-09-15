@@ -20,6 +20,7 @@ class FilmsPostgresExtractor(DataExtractor):
             type=data["type"],
             created=data["created"],
             modified=data["modified"],
+            viewing_permission=data["viewing_permission"],
             genres=data["genres"],
             actors=data["actors"],
             directors=data["directors"],

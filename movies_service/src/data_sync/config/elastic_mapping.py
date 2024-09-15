@@ -46,6 +46,7 @@ FILMS_MAPPING = {
                 "fields": {"raw": {"type": "keyword"}},
             },
             "description": {"type": "text", "analyzer": "ru_en"},
+            "viewing_permission": {"type": "text"},
             "directors_names": {"type": "text", "analyzer": "ru_en"},
             "actors_names": {"type": "text", "analyzer": "ru_en"},
             "writers_names": {"type": "text", "analyzer": "ru_en"},

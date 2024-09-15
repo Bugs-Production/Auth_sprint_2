@@ -34,8 +34,9 @@ class FilmworkAdmin(admin.ModelAdmin):
         "type",
         "creation_date",
         "rating",
+        "viewing_permission"
     )
-    list_filter = ("type", "rating")
+    list_filter = ("type", "rating", "viewing_permission")
     search_fields = ("title", "description", "id")
     ordering = ["title", "type"]
 
