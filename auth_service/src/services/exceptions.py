@@ -12,3 +12,7 @@ class ObjectAlreadyExistsException(Exception):
 
 class UserNotFoundError(Exception):
     pass
+
+
+class OAuthUserNotFoundError(Exception):
+    pass
