@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 
 from schemas.auths import AuthOutputSchema
 from services.auth import AuthService, get_auth_service
+from services.exceptions import OAuthUserNotFoundError, ObjectNotFoundError
 from services.oauth2 import OAuthServiceGoogle, get_google_service
 
 router = APIRouter()
@@ -60,3 +61,32 @@ async def auth2(
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
     return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.delete(
+    "/{login}",
+    status_code=200,
+    summary="Открепить social аккаунт от личного кабинета",
+    response_description="Открепить social аккаунт по логину в сервисе",
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Не найден пользователь или social аккаунт",
+            "content": {"application/json": {"example": {"detail": "error"}}},
+        }
+    },
+)
+async def delete_oauth_user(
+    login: str,
+    google_service: OAuthServiceGoogle = Depends(get_google_service),
+):
+    try:
+        await google_service.delete_oauth_account(login)
+    except ObjectNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="user by login not found",
+        )
+    except OAuthUserNotFoundError:
+        return {"detail": "social account already deleted"}
+
+    return {"detail": "social account successfully deleted"}
