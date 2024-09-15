@@ -11,18 +11,15 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name="filmwork",
-            options={"verbose_name": "filmwork",
-                     "verbose_name_plural": "filmworks"},
+            options={"verbose_name": "filmwork", "verbose_name_plural": "filmworks"},
         ),
         migrations.AlterModelOptions(
             name="genre",
-            options={"verbose_name": "genre",
-                     "verbose_name_plural": "genres"},
+            options={"verbose_name": "genre", "verbose_name_plural": "genres"},
         ),
         migrations.AlterModelOptions(
             name="person",
-            options={"verbose_name": "person",
-                     "verbose_name_plural": "persons"},
+            options={"verbose_name": "person", "verbose_name_plural": "persons"},
         ),
         migrations.RemoveField(
             model_name="person",

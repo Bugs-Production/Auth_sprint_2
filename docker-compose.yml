@@ -141,7 +141,7 @@ services:
       - movies_network
 
 
-# ------- general nginx ------ #
+# ------- common services ------ #
   nginx:
       container_name: movies_nginx
       build:
@@ -160,6 +160,15 @@ services:
         - "80:80"
       networks:
         - movies_network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: movies_jaeger
+    restart: unless-stopped
+    networks:
+      - movies_network
+    ports:
+      - "16686:16686"
 
 networks:
   movies_network:

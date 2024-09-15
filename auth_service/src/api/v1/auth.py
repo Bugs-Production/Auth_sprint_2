@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
+from fastapi import APIRouter, Depends, HTTPException, Request
+
 from api.auth_utils import decode_token
-from fastapi import APIRouter, Depends, HTTPException
 from schemas.auths import (AuthOutputSchema, LoginInputSchema,
                            RefreshInputSchema)
 from schemas.users import CreateUserSchema
@@ -47,9 +48,7 @@ async def signup(
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(
-        access_token=access_token, refresh_token=refresh_token, user_id=user_id
-    )
+    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
 
 
 @router.post(
@@ -94,9 +93,7 @@ async def refresh(
         user_roles,
     )
 
-    return AuthOutputSchema(
-        access_token=access_token, refresh_token=refresh_token, user_id=user_id
-    )
+    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
 
 
 @router.post(
@@ -122,6 +119,7 @@ async def refresh(
     },
 )
 async def login(
+    request: Request,
     login_data: LoginInputSchema,
     auth_service: AuthService = Depends(get_auth_service),
     user_service: UserService = Depends(get_user_service),
@@ -135,17 +133,16 @@ async def login(
         raise HTTPException(HTTPStatus.BAD_REQUEST, detail="invalid password")
 
     user_id = str(user.id)
+    user_agent = request.headers.get("user-agent", "Unknown")
 
-    await user_service.save_login_history(user_id)
+    await user_service.save_login_history(user_id, user_agent)
 
     user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
 
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(
-        access_token=access_token, refresh_token=refresh_token, user_id=user_id
-    )
+    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
 
 
 @router.post(

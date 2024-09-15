@@ -34,6 +34,7 @@ class UpdateUserSchema(BaseModel):
 class UserLoginHistorySchema(BaseModel):
     event_date: datetime
     success: bool
+    user_agent: str
 
 
 class CreateUserSchema(BaseModel):
@@ -41,6 +42,7 @@ class CreateUserSchema(BaseModel):
     password: str = Field(min_length=1)
     first_name: str | None = None
     last_name: str | None = None
+    email: EmailStr
 
     @model_validator(mode="after")
     def check_at_least_one_field_exists(self):

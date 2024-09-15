@@ -1,13 +1,12 @@
 import uuid
 
-from sqlalchemy import Column, Date, DateTime, String, func
+from sqlalchemy import Column, Date, DateTime, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from db.postgres import Base
 from models.associations import user_role
-from models.sqlalchemy_utils.email import EmailType
 
 
 class User(Base):
@@ -24,18 +23,42 @@ class User(Base):
     password = Column(String(255), nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
-    email = Column(EmailType)
+    email = Column(String(250), unique=True, nullable=False)
     birthdate = Column(Date)
     created_at = Column(DateTime, default=func.now())
-    roles = relationship("Role", secondary=user_role, backref="users", cascade="all, delete")
-    login_history = relationship("LoginHistory", back_populates="user", cascade="all, delete")
-    refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete")
+    roles = relationship(
+        "Role",
+        secondary=user_role,
+        backref="users",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    login_history = relationship(
+        "LoginHistory",
+        back_populates="user",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    refresh_tokens = relationship(
+        "RefreshToken",
+        back_populates="user",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    oauth_accounts = relationship(
+        "OAuthAccount",
+        back_populates="user",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    __table_args__ = (UniqueConstraint("login", "email", name="login_email_unique"),)
 
     def __init__(
-        self, login: str, password: str, first_name: str, last_name: str
+        self, login: str, password: str, email: str, first_name: str, last_name: str
     ) -> None:
         self.login = login
         self.password = generate_password_hash(password)
+        self.email = email
         self.first_name = first_name
         self.last_name = last_name
 

@@ -29,13 +29,7 @@ class GenreAdmin(admin.ModelAdmin):
 class FilmworkAdmin(admin.ModelAdmin):
     inlines = (GenreFilmworkInline, PersonFilmworkInline)
     list_per_page = 20
-    list_display = (
-        "title",
-        "type",
-        "creation_date",
-        "rating",
-        "viewing_permission"
-    )
+    list_display = ("title", "type", "creation_date", "rating", "viewing_permission")
     list_filter = ("type", "rating", "viewing_permission")
     search_fields = ("title", "description", "id")
     ordering = ["title", "type"]

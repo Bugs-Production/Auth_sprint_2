@@ -11,7 +11,7 @@ stop:
 	docker-compose down
 
 .PHONY: makemigrations_auth
-makemigrations:
+makemigrations_auth:
 	@read -p "Enter migration message: " MSG; \
 	docker exec movies_auth alembic revision --autogenerate -m "$$MSG"
 

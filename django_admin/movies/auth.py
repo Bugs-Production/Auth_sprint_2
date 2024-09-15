@@ -1,13 +1,12 @@
 import http
 from logging import getLogger
+from time import sleep
 
 import requests
-
 from config.components.auth import (ADMIN_ROLE_KEY, AUTH_SERVICE_HOST,
                                     AUTH_SERVICE_PORT)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
-from time import sleep
 
 User = get_user_model()
 
