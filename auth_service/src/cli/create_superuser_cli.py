@@ -11,8 +11,8 @@ app = typer.Typer()
 
 
 @app.command()
-def superuser(login: str, password: str, first_name: str, last_name: str):
-    asyncio.run(create_superuser(login, password, first_name, last_name))
+def superuser(login: str, password: str, first_name: str, last_name: str, email: str):
+    asyncio.run(create_superuser(login, password, first_name, last_name, email))
     typer.echo("Superuser created successfully.")
 
 

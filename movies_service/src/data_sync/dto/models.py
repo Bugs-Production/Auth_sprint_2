@@ -13,6 +13,7 @@ class PostgresFilmWork(BaseModel):
     type: str
     created: datetime
     modified: datetime
+    viewing_permission: str
     genres: list[str] | None = None
     actors: list[str] | None = None
     directors: list[str] | None = None
@@ -30,6 +31,7 @@ class ElasticFilmWork(BaseModel):
     genres: list[dict[str, Any]] | None = None
     title: str
     description: str | None = None
+    viewing_permission: str
     directors_names: list[str] | None = None
     actors_names: list[str] | None = None
     writers_names: list[str] | None = None

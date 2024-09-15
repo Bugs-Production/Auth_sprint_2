@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
-
 from schemas.auths import AuthOutputSchema
 from services.auth import AuthService, get_auth_service
 from services.exceptions import OAuthUserNotFoundError, ObjectNotFoundError
@@ -60,7 +59,9 @@ async def auth2(
     access_token = await auth_service.generate_access_token(user_id, [])
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.delete(

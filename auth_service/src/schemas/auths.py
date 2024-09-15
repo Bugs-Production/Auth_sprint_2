@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 class AuthOutputSchema(BaseModel):
     access_token: str
     refresh_token: str
+    user_id: str
 
 
 class RefreshInputSchema(BaseModel):

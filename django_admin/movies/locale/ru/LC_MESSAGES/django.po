@@ -74,11 +74,11 @@ msgstr "Полное имя"
 
 #: movies/models.py:67
 msgid "person"
-msgstr "Линость"
+msgstr "Личность"
 
 #: movies/models.py:68
 msgid "persons"
-msgstr "Линости"
+msgstr "Личности"
 
 #: movies/models.py:78
 msgid "role"

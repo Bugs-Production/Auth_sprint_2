@@ -86,7 +86,6 @@ services:
     env_file: ./movies_service/.env
     volumes:
       - postgres_data_movies:/var/lib/postgresql/data
-      - ./movies_service/data/data_dump.sql:/docker-entrypoint-initdb.d/data_dump.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
       interval: 5s
