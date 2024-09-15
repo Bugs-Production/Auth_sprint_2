@@ -33,7 +33,7 @@ class AbstractOAuthService(ABC):
         pass
 
     @abstractmethod
-    async def authorize_user(self, user_data: OAuthUser) -> AuthOutputSchema:
+    async def authorize_user(self, *args, **kwargs) -> AuthOutputSchema:
         pass
 
 
@@ -118,7 +118,7 @@ class OAuthServiceGoogle(AbstractOAuthService):
 
             return user
 
-    async def authorize_user(self, user_data: OAuthUser) -> AuthOutputSchema:
+    async def authorize_user(self, user_data: OAuthUser, user_agent: str) -> AuthOutputSchema:
         oauth_user_db = await self.get_oauth_user_from_db(user_data.oauth_user_id)
 
         if oauth_user_db:
@@ -153,7 +153,7 @@ class OAuthServiceGoogle(AbstractOAuthService):
         await self.create_oauth_user(user_data, service_user.id)
 
         # Фиксируем вход пользователя через OAuth
-        await self.user_service.save_login_history(service_user.id)
+        await self.user_service.save_login_history(service_user.id, user_agent)
 
         return service_user
 

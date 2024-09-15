@@ -52,7 +52,8 @@ async def auth2(
         access_token_to_provider
     )
 
-    service_user = await google_service.authorize_user(user_data=user_data)
+    user_agent = request.headers.get("user-agent", "Unknown")
+    service_user = await google_service.authorize_user(user_data, user_agent)
 
     user_id = str(service_user.id)
     access_token = await auth_service.generate_access_token(user_id, [])
