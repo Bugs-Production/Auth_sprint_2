@@ -1,8 +1,7 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
-
 from api.auth_utils import decode_token
+from fastapi import APIRouter, Depends, HTTPException
 from schemas.auths import (AuthOutputSchema, LoginInputSchema,
                            RefreshInputSchema)
 from schemas.users import CreateUserSchema
@@ -48,7 +47,9 @@ async def signup(
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(
@@ -93,7 +94,9 @@ async def refresh(
         user_roles,
     )
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(
@@ -140,7 +143,9 @@ async def login(
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(
