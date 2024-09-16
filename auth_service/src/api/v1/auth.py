@@ -43,8 +43,7 @@ async def signup(
         )
 
     user_id = str(user.id)
-    user_roles = [x.title for x in await user_service.get_user_roles(user_id)]
-
+    user_roles = []
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 

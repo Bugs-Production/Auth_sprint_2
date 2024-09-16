@@ -10,13 +10,13 @@ from db.elastic import ElasticStorage, get_elastic
 from db.redis import FilmRedisCache, get_redis
 from models.models import Film
 
-from .utils import (get_genre_filter_params, get_offset_params,
-                    get_search_params, get_sort_params)
+from .utils import (get_genre_filter_params, get_match_params,
+                    get_offset_params, get_sort_params)
 
 
 class AbstractFilmService(ABC):
     @abstractmethod
-    async def get_by_id(self, film_id: Any) -> Film | None:
+    async def get_by_id(self, film_id: Any, permission: str) -> Film | None:
         pass
 
     @abstractmethod
@@ -34,9 +34,9 @@ class FilmService(AbstractFilmService):
         self.elastic = ElasticStorage(elastic)
         self._index = "movies"
 
-    async def get_by_id(self, film_id: str) -> Film | None:
+    async def get_by_id(self, film_id: str, permission: str) -> Film | None:
         film = await self.redis.get_film(film_id=film_id)
-        if film:
+        if film and (film.viewing_permission == "FR" or permission == "PR"):
             return film
 
         doc = await self.elastic.get(index=self._index, id=film_id)
@@ -44,7 +44,13 @@ class FilmService(AbstractFilmService):
             return None
 
         film = Film(**doc["_source"])
-        await self.redis.put_film(film=film)
+
+        if permission == "PR":
+            await self.redis.put_film(film)
+            return film
+
+        if film.viewing_permission == "PR" and permission == "FR":
+            raise PermissionError
 
         return film
 
@@ -58,8 +64,8 @@ class FilmService(AbstractFilmService):
         sort_params = get_sort_params(sorting)
         genre_params = get_genre_filter_params(genre_filter)
         offset_params = get_offset_params(page_num, page_size)
-        params = {**sort_params, **genre_params, **offset_params}
 
+        params = {**sort_params, **genre_params, **offset_params}
         films = await self.redis.get_films(page_num, page_size, sorting, genre_filter)
         if films:
             return films
@@ -84,8 +90,8 @@ class FilmService(AbstractFilmService):
         page_size: int,
     ) -> list[Film] | None:
         sort_params = get_sort_params(sorting)
-        search_params = get_search_params(field="title", query=query)
         offset_params = get_offset_params(page_num, page_size)
+        search_params = get_match_params(field_to_query={"title": query})
         params = {**sort_params, **search_params, **offset_params}
 
         films = await self.redis.get_films(page_num, page_size, sorting, query)

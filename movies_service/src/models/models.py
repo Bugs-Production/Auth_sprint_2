@@ -38,6 +38,7 @@ class Film(IdMixIn):
     title: str
     description: str | None
     imdb_rating: float | None
+    viewing_permission: str
     genres: list[Genre]
     actors: list[Person] | None
     writers: list[Person] | None
