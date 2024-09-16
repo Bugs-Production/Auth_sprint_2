@@ -10,7 +10,7 @@ from db.elastic import ElasticStorage, get_elastic
 from db.redis import PersonsRedisCache, get_redis
 from models.models import PersonDetail
 
-from .utils import get_offset_params, get_search_params
+from .utils import get_match_params, get_offset_params
 
 
 class AbstractPersonService(ABC):
@@ -50,7 +50,7 @@ class PersonService(AbstractPersonService):
         page_num: int,
         page_size: int,
     ) -> list[PersonDetail] | None:
-        search_params = get_search_params(field="full_name", query=query)
+        search_params = get_match_params(field_to_query={"full_name": query})
         offset_params = get_offset_params(page_num, page_size)
         params = {**search_params, **offset_params}
 

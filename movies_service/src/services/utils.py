@@ -35,15 +35,13 @@ def get_genre_filter_params(genre_filter: str | None) -> dict[str, Any]:
     return genre_params
 
 
-def get_search_params(field: str, query: str) -> dict[str, Any]:
-    """Параметры для запроса в Elastic с простым поисковым запросом по определенному полю"""
+def get_match_params(field_to_query: dict) -> dict:
+    must_clauses = []
 
-    return {
-        "query": {
-            "match": {
-                field: {
-                    "query": query,
-                }
-            }
-        }
-    }
+    for field, value in field_to_query.items():
+        must_clause = {"match": {field: value}}
+        must_clauses.append(must_clause)
+
+    query = {"query": {"bool": {"must": must_clauses}}}
+
+    return query
