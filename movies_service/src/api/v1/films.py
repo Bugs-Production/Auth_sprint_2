@@ -26,16 +26,13 @@ async def film_search(
     sort: str = "-imdb_rating",
     paginator: Paginator = Depends(Paginator),
     film_service: FilmService = Depends(get_film_service),
-    user: dict = Depends(security_jwt),
 ) -> list[Film]:
-    permission = await get_permissions(user)
 
     searched_films = await film_service.search(
         query=query,
         sorting=sort,
         page_num=paginator.page_number,
         page_size=paginator.page_size,
-        permission=permission,
     )
 
     if not searched_films:
@@ -59,20 +56,17 @@ async def films(
     genre: str | None = None,
     paginator: Paginator = Depends(Paginator),
     film_service: FilmService = Depends(get_film_service),
-    user: dict = Depends(security_jwt),
 ) -> list[Film]:
     """
     Для сортировки используется default="-imdb_rating" по бизнес логике,
     чтобы всегда выводились только популярные фильмы
     """
-    permission = await get_permissions(user)
 
     all_films = await film_service.get_all(
         sorting=sort,
         genre_filter=genre,
         page_num=paginator.page_number,
         page_size=paginator.page_size,
-        permission=permission,
     )
 
     if not all_films:
@@ -98,7 +92,13 @@ async def film_details(
 ) -> FilmDetail:
     permission = await get_permissions(user)
 
-    film = await film_service.get_by_id(film_id, permission)
+    try:
+        film = await film_service.get_by_id(film_id, permission)
+    except PermissionError:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN,
+            detail="Извините, фильм доступен только по подписке",
+        )
 
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="film not found")
