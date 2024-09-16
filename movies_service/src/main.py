@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import uvicorn
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -32,8 +33,11 @@ app = FastAPI(
 )
 
 
-# Подключаем роутер к серверу, указав префикс /v1/films
 # Теги указываем для удобства навигации по документации
 app.include_router(films.router, prefix="/movies/api/v1/films", tags=["films"])
 app.include_router(persons.router, prefix="/movies/api/v1/persons", tags=["persons"])
 app.include_router(genres.router, prefix="/movies/api/v1/genres", tags=["genres"])
+
+# Для локального запуска
+if __name__ == "__main__":
+    uvicorn.run(app="main:app", port=8080, reload=True)
