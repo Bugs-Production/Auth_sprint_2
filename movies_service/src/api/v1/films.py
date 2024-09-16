@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from api.paginator import Paginator
 from services.film import FilmService, get_film_service
 
+from ..jwt_access_token import get_permissions, security_jwt
 from .api_models import Film, FilmDetail
 
 router = APIRouter()
@@ -25,13 +26,16 @@ async def film_search(
     sort: str = "-imdb_rating",
     paginator: Paginator = Depends(Paginator),
     film_service: FilmService = Depends(get_film_service),
+    user: dict = Depends(security_jwt),
 ) -> list[Film]:
+    permission = await get_permissions(user)
 
     searched_films = await film_service.search(
         query=query,
         sorting=sort,
         page_num=paginator.page_number,
         page_size=paginator.page_size,
+        permission=permission,
     )
 
     if not searched_films:
@@ -55,16 +59,20 @@ async def films(
     genre: str | None = None,
     paginator: Paginator = Depends(Paginator),
     film_service: FilmService = Depends(get_film_service),
+    user: dict = Depends(security_jwt),
 ) -> list[Film]:
     """
     Для сортировки используется default="-imdb_rating" по бизнес логике,
     чтобы всегда выводились только популярные фильмы
     """
+    permission = await get_permissions(user)
+
     all_films = await film_service.get_all(
         sorting=sort,
         genre_filter=genre,
         page_num=paginator.page_number,
         page_size=paginator.page_size,
+        permission=permission,
     )
 
     if not all_films:
@@ -84,9 +92,13 @@ async def films(
     response_description="Название, рейтинг, описание, жанры и участники фильма",
 )
 async def film_details(
-    film_id: str, film_service: FilmService = Depends(get_film_service)
+    film_id: str,
+    film_service: FilmService = Depends(get_film_service),
+    user: dict = Depends(security_jwt),
 ) -> FilmDetail:
-    film = await film_service.get_by_id(film_id)
+    permission = await get_permissions(user)
+
+    film = await film_service.get_by_id(film_id, permission)
 
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="film not found")
