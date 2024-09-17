@@ -47,7 +47,9 @@ async def signup(
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(
@@ -92,7 +94,9 @@ async def refresh(
         user_roles,
     )
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(
@@ -141,7 +145,9 @@ async def login(
     access_token = await auth_service.generate_access_token(user_id, user_roles)
     refresh_token = await auth_service.emit_refresh_token(user_id)
 
-    return AuthOutputSchema(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
+    return AuthOutputSchema(
+        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 @router.post(

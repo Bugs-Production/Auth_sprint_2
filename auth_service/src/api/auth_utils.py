@@ -3,10 +3,11 @@ from typing import Any
 from uuid import UUID
 
 import jwt
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from core.config import JWT_ALGORITHM, settings
+from models import OAuthProviders
 
 # Для чтения access-токенов из заголовка запроса
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/login")
@@ -33,3 +34,7 @@ def check_admin(auth_data: dict[str, Any]):
     """Проверяет что только админ может получить доступ к endpoints"""
     if "admin" not in auth_data["roles"]:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
+
+
+def is_provider_available(provider_name: str) -> bool:
+    return provider_name in [provider.value for provider in OAuthProviders]
