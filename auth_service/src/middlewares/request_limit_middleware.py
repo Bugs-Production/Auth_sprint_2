@@ -19,8 +19,11 @@ async def check_request_limit(request: Request, call_next) -> Response:
     # Получаем User-Agent из заголовков запроса
     user_agent = request.headers.get("user-agent", "unknown")
 
+    # Ip юзера
+    user_ip = request.headers.get("x-real-ip")
+
     # Создаем ключ для лимита запросов
-    key = f"{user_agent}:{now.minute}"
+    key = f"{user_ip}{user_agent}:{now.minute}"
 
     # Используем pipeline для инкремента и установки TTL
     pipe.incr(key, 1)
