@@ -1,10 +1,11 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
+
 from core.config import settings
 from db import postgres
 from models.roles import Role
 from models.user import User
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
-                                    create_async_engine)
 
 
 async def create_superuser(

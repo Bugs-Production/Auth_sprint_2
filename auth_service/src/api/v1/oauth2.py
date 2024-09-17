@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
+
 from schemas.auths import AuthOutputSchema
 from services.auth import AuthService, get_auth_service
 from services.exceptions import OAuthUserNotFoundError, ObjectNotFoundError
