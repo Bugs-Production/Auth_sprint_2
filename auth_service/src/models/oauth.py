@@ -1,10 +1,15 @@
 import uuid
+from enum import Enum
 
-from sqlalchemy import Column, Enum, ForeignKey, String, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from db.postgres import Base
+
+
+class OAuthProviders(Enum):
+    GOOGLE = "google"
 
 
 class OAuthAccount(Base):
